@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Management System Demo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        .current-time {
+            text-align: center;
+            font-size: 1.1em;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #34495e;
+            font-size: 1.8em;
+            font-weight: 400;
+            margin-bottom: 20px;
+            position: relative;
+            padding-left: 20px;
+        }
+        .section h2::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 80%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-number {
+            font-size: 3em;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: #ffffff;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex: 1;
+            min-width: 120px;
+        }
+        .checkin-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        .checkin-btn:hover {
+            background: linear-gradient(135deg, #218838, #1aa085);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        .checkout-btn {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+            color: white;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+        .checkout-btn:hover {
+            background: linear-gradient(135deg, #c82333, #c0392b);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+        .primary-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .primary-btn:hover {
+            background: linear-gradient(135deg, #5a6fd8, #6a4195);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9em;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+        tr:hover td {
+            background-color: #f8f9fa;
+        }
+        .status-active {
+            color: #28a745;
+            font-weight: 600;
+        }
+        .status-completed {
+            color: #007bff;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+                border-radius: 10px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .section {
+                padding: 20px;
+            }
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            button {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Attendance Management System</h1>
+            <p>Professional Demo - Real-time Tracking & Reporting</p>
+        </header>
+        <div id="current-time" class="current-time"></div>
+
+        <!-- Dashboard -->
+        <div class="section">
+            <h2>📊 Dashboard Overview</h2>
+            <div class="stats" id="stats">
+                <!-- Stats will be populated by JS -->
+            </div>
+        </div>
+
+        <!-- Staff Check-in -->
+        <div class="section">
+            <h2>👥 Staff Attendance</h2>
+            <div class="form-group">
+                <label for="staff-select">Select Staff Member:</label>
+                <select id="staff-select">
+                    <option value="">Choose a staff member...</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button id="staff-checkin" class="checkin-btn">✓ Check In</button>
+                <button id="staff-checkout" class="checkout-btn">✗ Check Out</button>
+            </div>
+        </div>
+
+        <!-- Vendor Check-in -->
+        <div class="section">
+            <h2>🚚 Vendor Attendance</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="vendor-select">Select Vendor:</label>
+                    <select id="vendor-select">
+                        <option value="">Choose a vendor...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="vendor-purpose">Purpose of Visit:</label>
+                    <input type="text" id="vendor-purpose" placeholder="e.g., IT Maintenance, Office Supplies">
+                </div>
+            </div>
+            <div class="button-group">
+                <button id="vendor-checkin" class="checkin-btn">✓ Check In</button>
+            </div>
+        </div>
+
+        <!-- Visitor Check-in -->
+        <div class="section">
+            <h2>👤 Visitor Registration</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="visitor-name">Full Name:</label>
+                    <input type="text" id="visitor-name" placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label for="visitor-email">Email Address:</label>
+                    <input type="email" id="visitor-email" placeholder="visitor@example.com">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="visitor-phone">Phone Number:</label>
+                    <input type="tel" id="visitor-phone" placeholder="+1 (555) 123-4567">
+                </div>
+                <div class="form-group">
+                    <label for="visitor-company">Company:</label>
+                    <input type="text" id="visitor-company" placeholder="Company name">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="visitor-purpose">Purpose of Visit:</label>
+                    <input type="text" id="visitor-purpose" placeholder="Meeting, Interview, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="visitor-host">Host Employee:</label>
+                    <input type="text" id="visitor-host" placeholder="Host's full name">
+                </div>
+            </div>
+            <div class="button-group">
+                <button id="visitor-checkin" class="checkin-btn">✓ Check In</button>
+                <button id="visitor-checkout" class="checkout-btn">✗ Check Out</button>
+            </div>
+        </div>
+
+        <!-- Reports -->
+        <div class="section">
+            <h2>📋 Attendance Reports</h2>
+            <table id="reports-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Check-In Time</th>
+                        <th>Check-Out Time</th>
+                        <th>Status</th>
+                        <th>Total Hours</th>
+                    </tr>
+                </thead>
+                <tbody id="reports-body">
+                    <!-- Reports will be populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Mock data
+        const staffData = [
+            { id: 1, name: 'John Doe', employeeId: 'EMP001', department: 'IT' },
+            { id: 2, name: 'Jane Smith', employeeId: 'EMP002', department: 'HR' },
+            { id: 3, name: 'Bob Johnson', employeeId: 'EMP003', department: 'Finance' },
+            { id: 4, name: 'Alice Brown', employeeId: 'EMP004', department: 'Marketing' },
+            { id: 5, name: 'Charlie Wilson', employeeId: 'EMP005', department: 'Operations' }
+        ];
+
+        const vendorData = [
+            { id: 1, vendorId: 'VEN001', contactPerson: 'Mike Davis', company: 'Tech Solutions', serviceType: 'IT Services' },
+            { id: 2, vendorId: 'VEN002', contactPerson: 'Sarah Lee', company: 'Office Supplies Inc', serviceType: 'Office Supplies' },
+            { id: 3, vendorId: 'VEN003', contactPerson: 'Tom Garcia', company: 'CleanCorp', serviceType: 'Cleaning' },
+            { id: 4, vendorId: 'VEN004', contactPerson: 'Lisa Chen', company: 'SecureGuard', serviceType: 'Security' }
+        ];
+
+        let attendanceRecords = [];
+        let visitorRecords = [];
+
+        // Initialize
+        function init() {
+            populateStaffSelect();
+            populateVendorSelect();
+            updateCurrentTime();
+            updateStats();
+            updateReports();
+            setInterval(updateCurrentTime, 1000);
+        }
+
+        // Populate selects
+        function populateStaffSelect() {
+            const select = document.getElementById('staff-select');
+            staffData.forEach(staff => {
+                const option = document.createElement('option');
+                option.value = staff.id;
+                option.textContent = `${staff.name} (${staff.department})`;
+                select.appendChild(option);
+            });
+        }
+
+        function populateVendorSelect() {
+            const select = document.getElementById('vendor-select');
+            vendorData.forEach(vendor => {
+                const option = document.createElement('option');
+                option.value = vendor.id;
+                option.textContent = `${vendor.contactPerson} (${vendor.company})`;
+                select.appendChild(option);
+            });
+        }
+
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleString();
+        }
+
+        // Update stats
+        function updateStats() {
+            const today = new Date().toDateString();
+            const todayRecords = attendanceRecords.filter(record => 
+                new Date(record.checkInTime).toDateString() === today
+            );
+
+            const activeRecords = attendanceRecords.filter(record => !record.checkOutTime);
+
+            const staffToday = todayRecords.filter(record => record.userType === 'staff').length;
+            const vendorsToday = todayRecords.filter(record => record.userType === 'vendor').length;
+            const visitorsToday = visitorRecords.filter(visitor => 
+                visitor.checkInTime && new Date(visitor.checkInTime).toDateString() === today
+            ).length;
+
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <span class="stat-number">${staffToday}</span>
+                    <div class="stat-label">Staff Today</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${vendorsToday}</span>
+                    <div class="stat-label">Vendors Today</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${visitorsToday}</span>
+                    <div class="stat-label">Visitors Today</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${activeRecords.length}</span>
+                    <div class="stat-label">Currently Active</div>
+                </div>
+            `;
+        }
+
+        // Staff check-in/out
+        document.getElementById('staff-checkin').addEventListener('click', () => {
+            const staffId = document.getElementById('staff-select').value;
+            if (!staffId) return alert('Please select a staff member');
+
+            const staff = staffData.find(s => s.id == staffId);
+            const existingRecord = attendanceRecords.find(r => r.userId == staffId && r.userType === 'staff' && !r.checkOutTime);
+
+            if (existingRecord) {
+                return alert('Staff member is already checked in');
+            }
+
+            const record = {
+                id: Date.now(),
+                userId: staffId,
+                userType: 'staff',
+                userName: staff.name,
+                checkInTime: new Date().toISOString(),
+                location: { lat: 40.7128, lon: -74.0060, address: 'New York, NY' },
+                status: 'active'
+            };
+
+            attendanceRecords.push(record);
+            updateStats();
+            updateReports();
+            alert(`${staff.name} checked in successfully`);
+        });
+
+        document.getElementById('staff-checkout').addEventListener('click', () => {
+            const staffId = document.getElementById('staff-select').value;
+            if (!staffId) return alert('Please select a staff member');
+
+            const record = attendanceRecords.find(r => r.userId == staffId && r.userType === 'staff' && !r.checkOutTime);
+            if (!record) {
+                return alert('Staff member is not checked in');
+            }
+
+            record.checkOutTime = new Date().toISOString();
+            record.status = 'completed';
+            record.totalHours = ((new Date(record.checkOutTime) - new Date(record.checkInTime)) / (1000 * 60 * 60)).toFixed(2);
+
+            updateStats();
+            updateReports();
+            alert('Checked out successfully');
+        });
+
+        // Vendor check-in
+        document.getElementById('vendor-checkin').addEventListener('click', () => {
+            const vendorId = document.getElementById('vendor-select').value;
+            const purpose = document.getElementById('vendor-purpose').value;
+
+            if (!vendorId) return alert('Please select a vendor');
+            if (!purpose) return alert('Please enter purpose');
+
+            const vendor = vendorData.find(v => v.id == vendorId);
+
+            const record = {
+                id: Date.now(),
+                userId: vendorId,
+                userType: 'vendor',
+                userName: vendor.contactPerson,
+                company: vendor.company,
+                purpose: purpose,
+                checkInTime: new Date().toISOString(),
+                location: { lat: 40.7128, lon: -74.0060, address: 'New York, NY' },
+                status: 'active'
+            };
+
+            attendanceRecords.push(record);
+            updateStats();
+            updateReports();
+            alert(`${vendor.contactPerson} checked in successfully`);
+            document.getElementById('vendor-purpose').value = '';
+        });
+
+        // Visitor check-in/out
+        document.getElementById('visitor-checkin').addEventListener('click', () => {
+            const name = document.getElementById('visitor-name').value;
+            const email = document.getElementById('visitor-email').value;
+            const phone = document.getElementById('visitor-phone').value;
+            const company = document.getElementById('visitor-company').value;
+            const purpose = document.getElementById('visitor-purpose').value;
+            const host = document.getElementById('visitor-host').value;
+
+            if (!name || !email || !purpose || !host) {
+                return alert('Please fill in all required fields');
+            }
+
+            const visitor = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                phone: phone,
+                company: company,
+                purpose: purpose,
+                hostName: host,
+                checkInTime: new Date().toISOString(),
+                status: 'active'
+            };
+
+            visitorRecords.push(visitor);
+            updateStats();
+            updateReports();
+            alert(`${name} checked in successfully`);
+
+            // Clear form
+            ['visitor-name', 'visitor-email', 'visitor-phone', 'visitor-company', 'visitor-purpose', 'visitor-host'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+        });
+
+        document.getElementById('visitor-checkout').addEventListener('click', () => {
+            const name = document.getElementById('visitor-name').value;
+            if (!name) return alert('Please enter visitor name to check out');
+
+            const visitor = visitorRecords.find(v => v.name.toLowerCase() === name.toLowerCase() && v.status === 'active');
+            if (!visitor) {
+                return alert('Visitor not found or already checked out');
+            }
+
+            visitor.checkOutTime = new Date().toISOString();
+            visitor.status = 'completed';
+            visitor.totalHours = ((new Date(visitor.checkOutTime) - new Date(visitor.checkInTime)) / (1000 * 60 * 60)).toFixed(2);
+
+            updateStats();
+            updateReports();
+            alert('Visitor checked out successfully');
+            document.getElementById('visitor-name').value = '';
+        });
+
+        // Update reports
+        function updateReports() {
+            const tbody = document.getElementById('reports-body');
+            tbody.innerHTML = '';
+
+            // Staff and vendor records
+            attendanceRecords.forEach(record => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = record.userName;
+                row.insertCell(1).textContent = record.userType;
+                row.insertCell(2).textContent = new Date(record.checkInTime).toLocaleString();
+                row.insertCell(3).textContent = record.checkOutTime ? new Date(record.checkOutTime).toLocaleString() : 'N/A';
+                const statusCell = row.insertCell(4);
+                statusCell.textContent = record.status;
+                statusCell.className = record.status === 'active' ? 'status-active' : 'status-completed';
+                row.insertCell(5).textContent = record.totalHours || 'N/A';
+            });
+
+            // Visitor records
+            visitorRecords.forEach(visitor => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = visitor.name;
+                row.insertCell(1).textContent = 'visitor';
+                row.insertCell(2).textContent = new Date(visitor.checkInTime).toLocaleString();
+                row.insertCell(3).textContent = visitor.checkOutTime ? new Date(visitor.checkOutTime).toLocaleString() : 'N/A';
+                const statusCell = row.insertCell(4);
+                statusCell.textContent = visitor.status;
+                statusCell.className = visitor.status === 'active' ? 'status-active' : 'status-completed';
+                row.insertCell(5).textContent = visitor.totalHours || 'N/A';
+            });
+        }
+
+        // Initialize on load
+        window.onload = init;
+    </script>
+</body>
+</html>
